@@ -1,0 +1,110 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/playfair.ttf') format('truetype');
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Playfair Display';
+  src: url('/fonts/playfair-italic.ttf') format('truetype');
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/inter.ttf') format('truetype');
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --border: 240 3.7% 90%;
+    --radius: 0.625rem;
+  }
+  * {
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  html,
+  body,
+  #root {
+    margin: 0;
+    height: 100%;
+    overscroll-behavior: none;
+  }
+  body {
+    background: #0690d4;
+    font-family: 'Inter', system-ui, sans-serif;
+    color: #fff;
+  }
+}
+
+.font-serif-display {
+  font-family: 'Playfair Display', Georgia, serif;
+}
+
+/* Full-height white scrollbar — signature right-edge bar */
+::-webkit-scrollbar {
+  width: 7px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0);
+}
+::-webkit-scrollbar-thumb {
+  border-bottom: 100vh solid #fff;
+}
+
+/* Close button for portal overlays */
+.close-x {
+  position: absolute;
+  left: 32px;
+  top: 32px;
+  width: 48px;
+  height: 48px;
+  opacity: 0.35;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+.close-x:hover {
+  opacity: 1;
+}
+.close-x::before,
+.close-x::after {
+  position: absolute;
+  left: 1.5rem;
+  content: ' ';
+  height: 40px;
+  width: 1.5px;
+  background-color: #fff;
+}
+.close-x::before {
+  transform: rotate(45deg);
+}
+.close-x::after {
+  transform: rotate(-45deg);
+}
+
+/* Animated scroll hint */
+@keyframes hint-pulse {
+  0%,
+  100% {
+    opacity: 0.9;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 0.35;
+    transform: translateY(5px);
+  }
+}
+.animate-hint {
+  animation: hint-pulse 2.2s ease-in-out infinite;
+}
