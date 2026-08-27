@@ -5,20 +5,8 @@ import { useEffect, useRef, useState } from 'react'
 import * as THREE from 'three'
 import { FONTS } from '@/store'
 import { useIsMobile } from '@/hooks/use-mobile'
-
-interface FooterLink {
-  name: string
-  hoverText: string
-  url: string
-}
-
-const LINKS: FooterLink[] = [
-  { name: 'LinkedIn', hoverText: 'Connect with me', url: 'https://www.linkedin.com/' },
-  { name: 'GitHub', hoverText: 'Open sourcing', url: 'https://github.com/' },
-  { name: 'Spotify', hoverText: 'Curated playlists', url: 'https://open.spotify.com/' },
-  { name: 'Instagram', hoverText: '@arivale', url: 'https://www.instagram.com/' },
-  { name: 'Resume', hoverText: 'Download', url: '#' },
-]
+import { FOOTER_LINKS } from '@/constants/footer'
+import type { FooterLink } from '@/types/footer'
 
 function FooterLinkItem({ link }: { link: FooterLink }) {
   const textRef = useRef<THREE.Mesh>(null)
@@ -32,7 +20,7 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
     if (!div) {
       div = document.createElement('div')
       div.id = id
-      div.textContent = link.hoverText.toUpperCase()
+      div.textContent = (link.hoverText ?? link.name).toUpperCase()
       Object.assign(div.style, {
         position: 'fixed',
         zIndex: '45',
@@ -54,17 +42,18 @@ function FooterLinkItem({ link }: { link: FooterLink }) {
 
   useEffect(() => {
     const div = document.getElementById(`footer-link-${link.name}`)
+    const textObject = textRef.current
     if (hovered && div) {
       gsap.fromTo(div, { opacity: 0 }, { opacity: 0.6, delay: 0.15 })
     } else if (div) {
       gsap.to(div, { opacity: 0 })
     }
-    if (textRef.current) {
-      gsap.to(textRef.current, { letterSpacing: hovered ? 0.3 : 0, duration: 0.3 })
+    if (textObject) {
+      gsap.to(textObject, { letterSpacing: hovered ? 0.3 : 0, duration: 0.3 })
     }
     return () => {
       if (div) gsap.killTweensOf(div)
-      if (textRef.current) gsap.killTweensOf(textRef.current)
+      if (textObject) gsap.killTweensOf(textObject)
     }
   }, [hovered, link.name])
 
@@ -105,7 +94,7 @@ export default function Footer3D() {
   return (
     <group position={[0, -44, 18]} rotation={[-Math.PI / 2, 0, 0]} ref={groupRef}>
       <group position={[isDesktop ? -4 : -2.6, 0, 0]}>
-        {LINKS.map((link, i) => (
+        {FOOTER_LINKS.map((link, i) => (
           <group key={link.name} position={[i * (isDesktop ? 2 : 1.05), 0, 0]}>
             <FooterLinkItem link={link} />
           </group>

@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 /* ---------- Theme (light sky / dark night) ---------- */
 
@@ -17,13 +18,21 @@ interface ThemeStore {
   nextTheme: () => void
 }
 
-export const useThemeStore = create<ThemeStore>((set, get) => ({
-  theme: THEMES[0],
-  nextTheme: () => {
-    const idx = THEMES.findIndex((t) => t.type === get().theme.type)
-    set({ theme: THEMES[(idx + 1) % THEMES.length] })
-  },
-}))
+export const useThemeStore = create<ThemeStore>()(
+  persist(
+    (set, get) => ({
+      theme: THEMES[0],
+      nextTheme: () => {
+        const idx = THEMES.findIndex((t) => t.type === get().theme.type)
+        set({ theme: THEMES[(idx + 1) % THEMES.length] })
+      },
+    }),
+    {
+      name: 'portfolio-theme',
+      partialize: (state) => ({ theme: state.theme }),
+    },
+  ),
+)
 
 /* ---------- Scroll progress (fed from the canvas) ---------- */
 
@@ -51,7 +60,7 @@ export const usePortalStore = create<PortalStore>((set) => ({
 
 /** Shared font paths (bundled locally — no CDN dependency). */
 export const FONTS = {
-  serif: '/fonts/playfair.ttf',
-  serifItalic: '/fonts/playfair-italic.ttf',
-  sans: '/fonts/inter.ttf',
+  serif: '/soria-font.ttf',
+  serifItalic: '/soria-font.ttf',
+  sans: '/Vercetti-Regular.woff',
 }

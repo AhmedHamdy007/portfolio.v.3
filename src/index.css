@@ -3,21 +3,14 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'Playfair Display';
-  src: url('/fonts/playfair.ttf') format('truetype');
+  font-family: 'Soria';
+  src: url('/soria-font.ttf') format('truetype');
   font-weight: 100 900;
   font-display: swap;
 }
 @font-face {
-  font-family: 'Playfair Display';
-  src: url('/fonts/playfair-italic.ttf') format('truetype');
-  font-style: italic;
-  font-weight: 100 900;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Inter';
-  src: url('/fonts/inter.ttf') format('truetype');
+  font-family: 'Vercetti';
+  src: url('/Vercetti-Regular.woff') format('woff');
   font-weight: 100 900;
   font-display: swap;
 }
@@ -43,13 +36,21 @@
   }
   body {
     background: #0690d4;
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Vercetti', system-ui, sans-serif;
     color: #fff;
   }
 }
 
+/* The reference composition is framed inside the viewport, including while a
+   portal is active. Keep the frame on the Canvas itself so portal cameras
+   cannot stretch or hide it. */
+.base-canvas {
+  box-sizing: border-box;
+  border: 1px solid rgba(255, 255, 255, 0.95);
+}
+
 .font-serif-display {
-  font-family: 'Playfair Display', Georgia, serif;
+  font-family: 'Soria', Georgia, serif;
 }
 
 /* Full-height white scrollbar — signature right-edge bar */
@@ -91,6 +92,41 @@
 }
 .close-x::after {
   transform: rotate(-45deg);
+}
+
+/* Accessible close control that does not block portal scrolling. */
+.portal-close {
+  position: absolute;
+  left: 24px;
+  top: 24px;
+  width: 48px;
+  height: 48px;
+  opacity: 0.7;
+  cursor: pointer;
+  transition: opacity 0.25s ease;
+}
+.portal-close:hover,
+.portal-close:focus-visible {
+  opacity: 1;
+}
+.portal-close span,
+.portal-close span::after {
+  position: absolute;
+  left: 23px;
+  top: 4px;
+  width: 2px;
+  height: 40px;
+  border-radius: 999px;
+  background: #fff;
+  content: '';
+}
+.portal-close span {
+  transform: rotate(45deg);
+}
+.portal-close span::after {
+  left: 0;
+  top: 0;
+  transform: rotate(90deg);
 }
 
 /* Animated scroll hint */

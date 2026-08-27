@@ -2,6 +2,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { useScroll } from '@react-three/drei'
 import * as THREE from 'three'
 import { usePortalStore, useScrollStore } from '@/store'
+import { useIsMobile } from '@/hooks/use-mobile'
 
 /**
  * Replicates the reference site's camera choreography:
@@ -14,6 +15,7 @@ export default function CameraRig() {
   const data = useScroll()
   const isPortalActive = usePortalStore((s) => !!s.activePortalId)
   const setScrollProgress = useScrollStore((s) => s.setScrollProgress)
+  const isMobile = useIsMobile()
 
   useFrame((state, delta) => {
     if (!data) return
@@ -22,6 +24,9 @@ export default function CameraRig() {
     const d = data.range(0.85, 0.18)
 
     if (!isPortalActive) {
+      // Three cameras are mutable scene objects; this is intentionally inside
+      // the render loop rather than React state.
+      // eslint-disable-next-line react-hooks/immutability
       camera.rotation.x = THREE.MathUtils.damp(
         camera.rotation.x,
         -0.5 * Math.PI * a,
@@ -33,12 +38,8 @@ export default function CameraRig() {
       setScrollProgress(data.range(0, 1))
     }
 
-    if (!isPortalActive) {
-      camera.rotation.y = THREE.MathUtils.lerp(
-        camera.rotation.y,
-        -(state.pointer.x * Math.PI) / 90,
-        0.05
-      )
+    if (!isMobile && !isPortalActive) {
+      camera.rotation.y = THREE.MathUtils.lerp(camera.rotation.y, -(state.pointer.x * Math.PI) / 90, 0.05)
     }
   })
 
