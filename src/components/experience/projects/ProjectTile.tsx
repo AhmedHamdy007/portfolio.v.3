@@ -22,7 +22,7 @@ export default function ProjectTile({ project, index, position, rotation, active
   const projectRef = useRef<THREE.Group>(null)
   const hoverAnimRef = useRef<gsap.core.Timeline | null>(null)
   const [desktopHovered, setDesktopHovered] = useState(false)
-  const active = usePortalStore((state) => state.activePortalId === 'projects')
+  const isProjectSectionActive = usePortalStore((state) => state.activePortalId === 'projects')
   const hovered = isMobile ? activeId === index : desktopHovered
   const isTop = datePosition === 'top'
 
@@ -38,7 +38,7 @@ export default function ProjectTile({ project, index, position, rotation, active
       .to(projectRef.current.position, { z: hovered ? 1 : 0, duration: 0.2 }, 0)
       .to(projectRef.current.position, { y: hovered ? (isTop ? -2 : 0) : 0 }, 0)
       .to(projectRef.current.scale, { x: hovered ? 1.3 : 1, y: hovered ? 1.3 : 1, z: hovered ? 1.3 : 1 }, 0)
-      .to(title.position, { y: hovered ? 0.7 : -0.8, duration: 0.25 }, 0)
+      .to(title.position, { y: hovered ? 0.7 : -0.8 }, 0)
       .to(textBox.position, { y: hovered ? 0.7 : 0 }, 0)
       .to(textBox, { fillOpacity: hovered ? 1 : 0, duration: 0.4 }, 0)
       .to(dateGroup.position, { y: hovered ? 2.6 : isTop ? 1.4 : -1.4 }, 0)
@@ -53,20 +53,31 @@ export default function ProjectTile({ project, index, position, rotation, active
     return () => {
       hoverAnimRef.current?.kill()
     }
-  }, [hovered, isTop, project.url])
+  }, [hovered])
 
   useEffect(() => {
     if (!projectRef.current) return
-    gsap.to(projectRef.current.position, { y: active ? 0 : -11, duration: 1, delay: active ? index * 0.1 : 0 })
-  }, [active, index])
+    gsap.to(projectRef.current.position, { y: isProjectSectionActive ? 0 : -11, duration: 1, delay: isProjectSectionActive ? index * 0.1 : 0 })
+  }, [isProjectSectionActive, index])
 
-  const openProject = (event: ThreeEvent<MouseEvent>) => {
-    event.stopPropagation()
-    if (project.url) window.open(project.url, '_blank', 'noopener,noreferrer')
+  const handleClick = (e: ThreeEvent<MouseEvent>) => {
+    e.stopPropagation()
+    if (!project.url) return
+    const button = e.eventObject
+    gsap.to(button.position, { z: 0, duration: 0.1 })
+      .then(() => gsap.to(button.position, { z: 0.3, duration: 0.3 }))
+    setTimeout(() => window.open(project.url, '_blank'), 50)
+  }
+
+  const handlePointerOver = (e: ThreeEvent<MouseEvent>) => {
+    e.stopPropagation()
+    if (!isMobile && isProjectSectionActive) {
+      setDesktopHovered(true)
+    }
   }
 
   return (
-    <group position={position} rotation={rotation} onClick={(event) => { event.stopPropagation(); onClick() }} onPointerOver={(event) => { event.stopPropagation(); if (!isMobile && active) setDesktopHovered(true) }} onPointerOut={() => !isMobile && active && setDesktopHovered(false)}>
+    <group position={position} rotation={rotation} onClick={onClick} onPointerOver={handlePointerOver} onPointerOut={() => !isMobile && isProjectSectionActive && setDesktopHovered(false)}>
       <group ref={projectRef}>
         <mesh>
           <planeGeometry args={[4.2, 2, 1]} />
@@ -79,7 +90,7 @@ export default function ProjectTile({ project, index, position, rotation, active
           <Text {...subtitleProps} position={[-0.7, 0.2, 0]} fontSize={0.3}>{project.date.toUpperCase()}</Text>
         </group>
         <Text {...subtitleProps} maxWidth={3.8} position={[-1.9, 2.3, 0.1]} fontSize={0.2}>{project.subtext}</Text>
-        {project.url && <group position={[1.3, -0.6, -1]} scale={[0, 0, 1]} onClick={openProject}>
+        {project.url && <group position={[1.3, -0.6, -1]} scale={[0, 0, 1]} onClick={handleClick} onPointerOver={() => document.body.style.cursor = 'pointer'} onPointerOut={() => document.body.style.cursor = 'auto'}>
           <mesh><boxGeometry args={[1.1, 0.4, 0.2]} /><meshBasicMaterial color="#222" /><Edges color="white" lineWidth={1} /></mesh>
           <Text {...subtitleProps} color="white" position={[-0.4, 0.15, 0.2]} fontSize={0.25}>VIEW ↗</Text>
         </group>}

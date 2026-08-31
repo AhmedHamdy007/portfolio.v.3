@@ -35,6 +35,8 @@ export default function CameraRig() {
       )
       camera.position.y = THREE.MathUtils.damp(camera.position.y, -37 * b, 7, delta)
       camera.position.z = THREE.MathUtils.damp(camera.position.z, 5 + 10 * d, 7, delta)
+      camera.position.x = THREE.MathUtils.damp(camera.position.x, 0, 7, delta)
+      camera.rotation.y = THREE.MathUtils.damp(camera.rotation.y, 0, 7, delta)
       setScrollProgress(data.range(0, 1))
     }
 

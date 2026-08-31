@@ -19,15 +19,15 @@ export default function ProjectsPortal() {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/immutability
-    data.el.style.overflow = isActive ? 'hidden' : 'auto'
+    if (data?.el) data.el.style.overflow = isActive ? 'hidden' : 'auto'
     if (isActive) {
       if (isMobile) {
         gsap.to(camera.position, { z: 11.5, y: -39, x: 1, duration: 1, overwrite: 'auto' })
       } else {
-        gsap.to(camera.position, { y: -39, x: compactProjectLayout ? 0 : 2, duration: 1, overwrite: 'auto' })
+        gsap.to(camera.position, { y: -39, x: 2, duration: 1, overwrite: 'auto' })
       }
     }
-  }, [camera, compactProjectLayout, data.el, isActive, isMobile])
+  }, [camera, data, isActive, isMobile])
 
   useFrame((state, delta) => {
     if (!isActive || isMobile) return

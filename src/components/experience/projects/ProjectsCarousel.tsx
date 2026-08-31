@@ -7,35 +7,45 @@ import ProjectTile from './ProjectTile'
 export default function ProjectsCarousel() {
   const isMobile = useIsMobile()
   const [selectedId, setSelectedId] = useState<number | null>(null)
-  const active = usePortalStore((state) => state.activePortalId === 'projects')
-  const activeId = active ? selectedId : null
+  const isActive = usePortalStore((state) => state.activePortalId === 'projects')
+  const activeId = isActive ? selectedId : null
+
+  const onClick = (id: number) => {
+    if (!isMobile) return
+    setSelectedId(id === selectedId ? null : id)
+  }
+
   const tiles = useMemo(() => {
     const fov = Math.PI
     const distance = 10
-    const compact = PROJECTS.length <= 2
     const columns = Math.ceil(PROJECTS.length / 2)
     return PROJECTS.map((project, i) => {
       const row = i % 2
       const column = Math.floor(i / 2)
       const angle = (fov / columns) * column
-      // The reference carousel is a semicircle. With only two projects there
-      // is no arc to distribute, so keep the two cards stacked on its center.
-      const x = compact ? 0 : -distance * Math.cos(angle)
-      const z = compact ? 0 : -distance * Math.sin(angle)
+      const z = -distance * Math.sin(angle)
+      const x = -distance * Math.cos(angle)
+      const rotY = Math.PI / 2 - angle
+      const y = row === 0 ? 3.25 : 1
+      const datePosition = row === 0 ? 'top' : 'bottom'
       return (
         <ProjectTile
           key={i}
+          datePosition={datePosition}
           project={project}
           index={i}
-          position={[x, row === 0 ? 3.25 : 1, z]}
-          rotation={[0, compact ? 0 : Math.PI / 2 - angle, 0]}
+          position={[x, y, z]}
+          rotation={[0, rotY, 0]}
           activeId={activeId}
-          datePosition={row === 0 ? 'top' : 'bottom'}
-          onClick={() => isMobile && setSelectedId(i === selectedId ? null : i)}
+          onClick={() => onClick(i)}
         />
       )
     })
-  }, [activeId, isMobile, selectedId])
+  }, [activeId, isActive])
 
-  return <group rotation={[0, PROJECTS.length <= 2 ? 0 : -Math.PI / 12, 0]}>{tiles}</group>
+  return (
+    <group rotation={[0, -Math.PI / 12, 0]}>
+      {tiles}
+    </group>
+  )
 }
