@@ -43,19 +43,27 @@ interface ScrollStore {
 
 export const useScrollStore = create<ScrollStore>((set) => ({
   scrollProgress: 0,
-  setScrollProgress: (p) => set({ scrollProgress: p }),
+  setScrollProgress: (p) => set(state => state.scrollProgress === p ? state : { scrollProgress: p }),
 }))
 
 /* ---------- Portals (experience tiles → overlay panels) ---------- */
 
 interface PortalStore {
   activePortalId: string | null
+  isClosing: boolean
   setActivePortal: (id: string | null) => void
+  finishPortalExit: (id: string) => void
 }
 
 export const usePortalStore = create<PortalStore>((set) => ({
   activePortalId: null,
-  setActivePortal: (id) => set({ activePortalId: id }),
+  isClosing: false,
+  setActivePortal: (id) => set(state => {
+    if (id === null) return state.activePortalId && !state.isClosing ? { isClosing: true } : state
+    return state.activePortalId ? state : { activePortalId: id, isClosing: false }
+  }),
+  finishPortalExit: (id) => set(state => state.activePortalId === id && state.isClosing
+    ? { activePortalId: null, isClosing: false } : state),
 }))
 
 /** Shared font paths (bundled locally — no CDN dependency). */

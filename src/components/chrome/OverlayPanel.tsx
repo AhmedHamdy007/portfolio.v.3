@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { usePortalStore } from '@/store'
+import AlbumExperience from '@/components/experience/album/AlbumExperience'
 
 /**
  * Lightweight portal chrome. The actual work/project content lives in the
@@ -8,6 +9,7 @@ import { usePortalStore } from '@/store'
 export default function OverlayPanel() {
   const activePortalId = usePortalStore((state) => state.activePortalId)
   const setActivePortal = usePortalStore((state) => state.setActivePortal)
+  const isClosing = usePortalStore(state => state.isClosing)
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -20,18 +22,23 @@ export default function OverlayPanel() {
   if (!activePortalId) return null
 
   const isWork = activePortalId === 'work'
+  const isAlbum = activePortalId === 'album'
 
   return (
-    <div className="pointer-events-none fixed inset-0 z-50">
+    <div className="pointer-events-none fixed inset-0 z-50" data-portal-closing={isClosing} inert={isClosing}
+      style={{ opacity: isClosing ? 0 : 1, transition: isAlbum ? 'opacity 650ms ease' : 'opacity 200ms ease', pointerEvents: isClosing ? 'auto' : undefined }}>
       <button
         type="button"
         aria-label="Close portal"
         className="portal-close pointer-events-auto"
+        disabled={isClosing}
         onClick={() => setActivePortal(null)}
       >
         <span aria-hidden="true" />
       </button>
-      {isWork ? (
+      {isAlbum ? (
+        <AlbumExperience />
+      ) : isWork ? (
         <div className="absolute bottom-6 left-1/2 w-[min(32rem,calc(100vw-3rem))] -translate-x-1/2 text-center text-white/80">
           <p className="text-[0.72rem] leading-5 tracking-[0.05em]">
             “He possesses the drive, curiosity, persistence, and technical aptitude to become an outstanding DevOps engineer.”

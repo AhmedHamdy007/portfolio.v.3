@@ -7,8 +7,8 @@ import { usePortalStore, useScrollStore } from '@/store'
 export default function ScrollHint() {
   const ref = useRef<HTMLDivElement>(null)
   const portal = usePortalStore((s) => s.activePortalId)
-  const scrollProgress = useScrollStore((s) => s.scrollProgress)
-  const visible = !portal && scrollProgress === 0
+  const atTop = useScrollStore((s) => s.scrollProgress < 0.0001)
+  const visible = !portal && atTop
 
   useEffect(() => {
     if (!ref.current) return

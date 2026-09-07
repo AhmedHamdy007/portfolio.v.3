@@ -1,0 +1,81 @@
+.drift-ui { position: absolute; inset: 16px; color: #e7e9e9; pointer-events: none; font-family: Arial, sans-serif; overflow: hidden; }
+.drift-ui::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, #030508a6, transparent 19%, transparent 72%, #030508c9); pointer-events: none; }
+.drift-ui__header { position: absolute; top: 32px; left: 82px; right: 100px; display: flex; justify-content: space-between; align-items: center; font: 10px/1.5 monospace; letter-spacing: .13em; }
+.drift-ui__brand { display: flex; gap: 18px; color: #f2f0e8; }
+.drift-ui__brand > span { color: #5ed1d1; }
+.drift-ui__edition { color: #8e979e; font-size: 9px; }
+.drift-ui__rail { position: absolute; right: 35px; top: 26%; height: 43%; width: 1px; background: #ffffff1a; }
+.drift-ui__rail > span { display: block; height: 100%; background: #9ad9d7; transform-origin: top; }
+.drift-ui__title { position: absolute; left: 5%; bottom: 14%; text-shadow: 0 3px 32px #0009; }
+.drift-ui__title p { color: #b7c4c5; font: 8px/1.7 monospace; letter-spacing: .18em; margin-bottom: 18px; }
+.drift-ui__title h1 { font-size: clamp(70px, 9.5vw, 150px); line-height: .79; letter-spacing: -.075em; font-weight: 400; margin: 0; }
+.drift-ui__title h1 i { font-family: Georgia, serif; font-weight: 400; letter-spacing: -.065em; color: #d1ddd8; }
+.drift-ui__departure { bottom: 20%; }
+.drift-ui__departure h1 { font-size: clamp(58px, 7.4vw, 120px); line-height: .94; }
+.drift-ui__note { display: block; font: 11px/1.8 monospace; color: #a2adb6; letter-spacing: .02em; margin-top: 26px; }
+.drift-ui__afterglow { bottom: 17%; }
+.drift-ui__afterglow h1 { font-size: clamp(58px, 7.4vw, 120px); line-height: .94; }
+.drift-ui__passage { position: absolute; left: 6%; top: 28%; text-shadow: 0 2px 30px #000; }
+.drift-ui__passage p { font: 8px monospace; letter-spacing: .18em; color: #9ac3c4; }
+.drift-ui__passage h2 { font-size: clamp(34px, 4.2vw, 70px); letter-spacing: -.05em; font-weight: 400; line-height: 1.05; }
+.drift-ui__passage i { font-family: Georgia, serif; color: #d1ddd8; }
+.drift-ui__passage > span { font: 9px/1.7 monospace; color: #a7b8c0; }
+.drift-ui__afterglow button { margin-top: 24px; color: #a5d7d3 !important; border-bottom: 1px solid #a5d7d35c !important; }
+.drift-ui__chapters { display: flex; align-items: center; gap: 22px; }
+.drift-ui__chapters button { display: flex; gap: 8px; color: #84919a !important; font-size: 8px !important; }
+.drift-ui__chapters button[aria-current] { color: #c5e4e0 !important; }
+.drift-ui__chapters i { font-style: normal; }
+.drift-ui__gallery-label { position: absolute; top: 105px; left: 5%; text-shadow: 0 2px 20px #000; }
+.drift-ui__gallery-label > span { font: 8px monospace; color: #81a8ac; letter-spacing: .16em; }
+.drift-ui__gallery-label h2 { margin: 9px 0 4px; font-family: Georgia, serif; font-style: italic; font-size: 30px; letter-spacing: -.035em; font-weight: 400; }
+.drift-ui__gallery-label p { font: 8px monospace; letter-spacing: .03em; color: #99a8b1; }
+.drift-ui__coordinate { position: absolute; right: 27px; top: 73%; writing-mode: vertical-rl; font: 9px monospace; color: #779096; letter-spacing: .1em; }
+.drift-ui__footer { position: absolute; bottom: 29px; left: 36px; right: 36px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.drift-ui__footer p { color: #92a0a5; font: 8px/1.5 monospace; letter-spacing: .16em; text-align: center; }
+.drift-ui button, .drift-ui a { pointer-events: auto; cursor: pointer; }
+.drift-ui button { color: inherit; background: transparent; border: 0; font: 9px/1.5 monospace; letter-spacing: .12em; padding: 12px 0; }
+.drift-ui button:focus-visible, .drift-ui a:focus-visible { outline: 1px solid #83d7d5; outline-offset: 5px; }
+.drift-ui__footer button:first-child { min-width: 86px; display: flex; justify-content: space-between; }
+.drift-ui__footer button span { color: #84cfce; }
+.drift-ui__caption { position: absolute; left: 50%; bottom: 10%; transform: translateX(-50%); text-align: center; width: 85%; animation: drift-caption .7s .6s both; }
+.drift-ui__caption > span { color: #9eafba; font: 8px monospace; letter-spacing: .16em; }
+.drift-ui__caption i { font-style: normal; margin-left: 24px; }
+.drift-ui__caption h2 { margin: 9px 0 3px; font-size: clamp(20px, 2.5vw, 35px); font-weight: 400; letter-spacing: -.035em; }
+.drift-ui__caption button { font-size: 8px; color: #9ac3c4; }
+.drift-ui__index, .drift-ui__credits { position: absolute; bottom: 80px; left: 36px; width: min(390px, calc(100% - 72px)); max-height: calc(100% - 165px); overflow-y: auto; overscroll-behavior: contain; pointer-events: auto; background: #080d12f5; border: 1px solid #ffffff20; padding: 22px; backdrop-filter: blur(20px); }
+.drift-ui__index > p, .drift-ui__credits > p { font: 9px/1.5 monospace; color: #75bfc0; letter-spacing: .15em; margin: 0 0 17px; }
+.drift-ui__index > p > span { float: right; font-size: 8px; color: #839299; }
+.drift-ui__index button { width: 100%; display: flex; text-align: left; align-items: center; gap: 15px; border-top: 1px solid #ffffff12; font-size: 11px; letter-spacing: 0; }
+.drift-ui__index button > span { font: 8px monospace; color: #839299; }
+.drift-ui__index button > span:last-child { margin-left: auto; }
+.drift-ui__index button:hover { color: #82dedb; }
+.drift-ui__credits { left: auto; right: 36px; font: 11px/1.9 monospace; }
+.drift-ui__credits > a, .drift-ui__credits > span { display: block; color: #a9b6bd; margin-top: 8px; }
+@keyframes drift-caption { from { opacity: 0; translate: 0 10px; } to { opacity: 1; translate: 0 0; } }
+@media (max-width: 767px) {
+  .drift-ui { inset: 0; }
+  .drift-ui__header { left: 82px; top: 30px; right: 76px; }
+  .drift-ui__edition { display: none; }
+  .drift-ui__title { left: 24px; bottom: 17%; }
+  .drift-ui__title h1 { font-size: 88px; }
+  .drift-ui__departure h1 { font-size: 56px; }
+  .drift-ui__departure { bottom: 16%; }
+  .drift-ui__departure h1 { font-size: 48px; }
+  .drift-ui__note { max-width: 290px; font-size: 9px; }
+  .drift-ui__passage { top: 18%; }
+  .drift-ui__passage h2 { font-size: 34px; }
+  .drift-ui__passage > span { font-size: 7px; }
+  .drift-ui__chapters { position: absolute; top: 30px; left: -58px; gap: 8px; }
+  .drift-ui__chapters button { min-width: 36px; min-height: 44px; }
+  .drift-ui__chapters i { display: none; }
+  .drift-ui__gallery-label { top: 102px; left: 24px; }
+  .drift-ui__gallery-label h2 { font-size: 25px; }
+  .drift-ui__title p { font-size: 7px; max-width: 190px; }
+  .drift-ui__rail { right: 19px; }
+  .drift-ui__coordinate { right: 13px; }
+  .drift-ui__footer { bottom: 22px; left: 22px; right: 22px; flex-wrap: wrap; }
+  .drift-ui__footer p { order: 3; flex: 0 0 100%; font-size: 6px; margin: -7px 0 0; }
+  .drift-ui__caption { bottom: 15%; }
+  .drift-ui__index, .drift-ui__credits { left: 22px; right: 22px; width: auto; bottom: 96px; }
+}
+@media (prefers-reduced-motion: reduce) { .drift-ui__caption { animation: none; } }

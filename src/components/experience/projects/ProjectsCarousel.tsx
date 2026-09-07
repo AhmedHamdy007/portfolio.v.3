@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { usePortalStore } from '@/store'
 import { PROJECTS } from '@/constants'
@@ -10,10 +10,10 @@ export default function ProjectsCarousel() {
   const isActive = usePortalStore((state) => state.activePortalId === 'projects')
   const activeId = isActive ? selectedId : null
 
-  const onClick = (id: number) => {
+  const onClick = useCallback((id: number) => {
     if (!isMobile) return
-    setSelectedId(id === selectedId ? null : id)
-  }
+    setSelectedId((current) => id === current ? null : id)
+  }, [isMobile])
 
   const tiles = useMemo(() => {
     const fov = Math.PI
@@ -41,7 +41,7 @@ export default function ProjectsCarousel() {
         />
       )
     })
-  }, [activeId, isActive])
+  }, [activeId, onClick])
 
   return (
     <group rotation={[0, -Math.PI / 12, 0]}>

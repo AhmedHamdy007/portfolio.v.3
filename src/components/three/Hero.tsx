@@ -1,14 +1,15 @@
-import { Cloud, Clouds, Stars, Text, useProgress } from '@react-three/drei'
+import { Cloud, Clouds, Stars, Text } from '@react-three/drei'
 import gsap from 'gsap'
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
 import WindowModel from '@/components/models/WindowModel'
 import TextWindow from './TextWindow'
 import { useThemeStore, FONTS } from '@/store'
+import { useLoadingState } from '@/components/chrome/loadingState'
 
 function CloudContainer() {
   return (
-    <Clouds material={THREE.MeshBasicMaterial} position={[0, -5, 0]} frustumCulled={false}>
+    <Clouds texture="/cloud.png" material={THREE.MeshBasicMaterial} position={[0, -5, 0]} frustumCulled={false}>
       <Cloud seed={1} segments={1} concentrate="inside" bounds={[10, 10, 10]} growth={3} position={[-1, 0, 0]} smallestVolume={2} scale={1.9} volume={2} speed={0.2} fade={5} />
       <Cloud seed={3} segments={1} concentrate="outside" bounds={[10, 10, 10]} growth={2} position={[2, 0, 2]} smallestVolume={2} scale={1} volume={2} fade={3} speed={0.1} />
       <Cloud seed={4} segments={1} concentrate="outside" bounds={[10, 20, 15]} growth={4} position={[-10, -10, 4]} smallestVolume={2} scale={2} speed={0.2} volume={3} />
@@ -27,12 +28,13 @@ function StarsContainer() {
 
 export default function Hero() {
   const titleRef = useRef<THREE.Mesh>(null)
-  const { progress } = useProgress()
+  const revealing = useLoadingState(state => state.phase !== 'loading')
 
   useEffect(() => {
-    if (progress !== 100 || !titleRef.current) return
-    gsap.fromTo(titleRef.current.position, { y: -10 }, { y: 0, duration: 3, overwrite: 'auto' })
-  }, [progress])
+    if (!revealing || !titleRef.current) return
+    const tween = gsap.fromTo(titleRef.current.position, { y: -10 }, { y: 0, duration: 2.1, ease: 'power3.out', overwrite: 'auto' })
+    return () => { tween.kill() }
+  }, [revealing])
 
   return (
     <>

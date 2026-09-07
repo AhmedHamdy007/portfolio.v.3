@@ -1,0 +1,13 @@
+node_modules
+dist
+.git
+.codex
+.openai
+.env
+.env.*
+!.env.example
+*.log
+*.local
+coverage
+test-results
+playwright-report

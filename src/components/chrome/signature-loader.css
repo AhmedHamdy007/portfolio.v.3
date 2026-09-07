@@ -1,0 +1,50 @@
+.signature-loader {
+  --paper: #f7f4ef;
+  --ink: #20383f;
+  position: fixed; inset: 0; z-index: 1000;
+  color: var(--ink); overflow: hidden; isolation: isolate;
+  font-family: 'Vercetti', Arial, sans-serif; touch-action: none;
+}
+.signature-loader__shutter { position: absolute; left: 0; width: 100%; height: 50.1%; background: var(--paper); will-change: transform; }
+.signature-loader__shutter--top { top: 0; }
+.signature-loader__shutter--bottom { bottom: 0; }
+.signature-loader__stage {
+  position: absolute; left: 50%; top: 47%;
+  width: min(820px, 84vw); height: min(470px, 60vh);
+  transform: translate(-50%, -50%);
+}
+.signature-loader__initial {
+  position: absolute; top: 50%; transform: translateY(-50%);
+  font-family: 'Soria', Georgia, serif; font-weight: 400;
+  font-size: clamp(150px, 32vw, 410px); line-height: .9; user-select: none;
+}
+.signature-loader__initial--a { left: 0; }
+.signature-loader__initial--h { right: 0; }
+.signature-loader__contact-sheet { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); width: clamp(172px, 20vw, 250px); }
+.signature-loader__label { position: absolute; bottom: 100%; left: 0; right: 0; display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; color: #171713; font-size: 10px; font-weight: 400; line-height: 1.2; letter-spacing: -.025em; }
+.signature-loader__count { min-width: 3ch; text-align: right; font-variant-numeric: tabular-nums; }
+.signature-loader__reel { position: relative; width: 100%; aspect-ratio: 4 / 5; overflow: hidden; background: #e9e5de; }
+.signature-loader__photo { position: absolute; inset: 0; margin: 0; opacity: 0; will-change: opacity; }
+.signature-loader__photo:first-child { opacity: 1; }
+.signature-loader__photo img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.signature-loader__signature { position: absolute; top: calc(50% + min(29vh, 220px)); left: 0; right: 0; text-align: center; font-size: 10px; letter-spacing: .38em; }
+.signature-loader__retry { position: absolute; bottom: 32px; left: 24px; right: 24px; text-align: center; font-size: 11px; line-height: 1.7; }
+.signature-loader__retry p { margin: 0 0 8px; }
+.signature-loader__retry button { border: 0; border-bottom: 1px solid currentColor; background: none; color: inherit; padding: 8px 0; cursor: pointer; font: inherit; }
+.signature-loader button:focus-visible { outline: 2px solid #555b47; outline-offset: 5px; }
+@media (max-width: 600px) {
+  .signature-loader__stage { width: 88vw; top: 45%; }
+  .signature-loader__initial { font-size: 43vw; }
+  .signature-loader__contact-sheet { width: 34vw; max-width: 170px; }
+  .signature-loader__label { font-size: 8px; margin-bottom: 6px; }
+  .signature-loader__signature { top: 68%; font-size: 8px; letter-spacing: .25em; }
+}
+@media (max-height: 500px) and (min-width: 601px) {
+  .signature-loader__initial { font-size: 65vh; }
+  .signature-loader__contact-sheet { width: 24vh; }
+  .signature-loader__signature { top: 78%; }
+  .signature-loader__retry { bottom: 12px; font-size: 10px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .signature-loader__photo, .signature-loader__shutter { will-change: auto; }
+}

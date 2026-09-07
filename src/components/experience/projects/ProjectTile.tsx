@@ -23,7 +23,7 @@ export default function ProjectTile({ project, index, position, rotation, active
   const hoverAnimRef = useRef<gsap.core.Timeline | null>(null)
   const [desktopHovered, setDesktopHovered] = useState(false)
   const isProjectSectionActive = usePortalStore((state) => state.activePortalId === 'projects')
-  const hovered = isMobile ? activeId === index : desktopHovered
+  const hovered = isProjectSectionActive && (isMobile ? activeId === index : desktopHovered)
   const isTop = datePosition === 'top'
 
   const titleProps = useMemo(() => ({ font: '/soria-font.ttf', color: 'black' }), [])
@@ -53,11 +53,12 @@ export default function ProjectTile({ project, index, position, rotation, active
     return () => {
       hoverAnimRef.current?.kill()
     }
-  }, [hovered])
+  }, [hovered, isTop, project.url])
 
   useEffect(() => {
     if (!projectRef.current) return
-    gsap.to(projectRef.current.position, { y: isProjectSectionActive ? 0 : -11, duration: 1, delay: isProjectSectionActive ? index * 0.1 : 0 })
+    const tween = gsap.to(projectRef.current.position, { y: isProjectSectionActive ? 0 : -11, duration: 1, delay: isProjectSectionActive ? index * 0.1 : 0 })
+    return () => { tween.kill() }
   }, [isProjectSectionActive, index])
 
   const handleClick = (e: ThreeEvent<MouseEvent>) => {
@@ -84,10 +85,10 @@ export default function ProjectTile({ project, index, position, rotation, active
           <meshBasicMaterial color="#fff" transparent opacity={0.3} />
           <Edges color="black" lineWidth={1.5} />
         </mesh>
-        <Text {...titleProps} position={[-1.9, -0.8, 0.101]} anchorX="left" anchorY="bottom" maxWidth={4} fontSize={0.8}>{project.title}</Text>
+        <Text {...titleProps} position={[-1.9, -0.8, 0.101]} anchorX="left" anchorY="bottom" maxWidth={4} fontSize={project.title.length > 18 ? 0.6 : 0.8}>{project.title}</Text>
         <group position={[-1.25, 1.4, 0.01]}>
           <mesh><planeGeometry args={[1.7, 0.4, 1]} /><meshBasicMaterial color="#777" transparent opacity={0} wireframe /><Edges color="black" lineWidth={1} /></mesh>
-          <Text {...subtitleProps} position={[-0.7, 0.2, 0]} fontSize={0.3}>{project.date.toUpperCase()}</Text>
+          <Text {...subtitleProps} position={[-0.7, 0.2, 0]} maxWidth={1.4} fontSize={project.date.length > 9 ? 0.19 : 0.3}>{project.date.toUpperCase()}</Text>
         </group>
         <Text {...subtitleProps} maxWidth={3.8} position={[-1.9, 2.3, 0.1]} fontSize={0.2}>{project.subtext}</Text>
         {project.url && <group position={[1.3, -0.6, -1]} scale={[0, 0, 1]} onClick={handleClick} onPointerOver={() => document.body.style.cursor = 'pointer'} onPointerOut={() => document.body.style.cursor = 'auto'}>
