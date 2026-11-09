@@ -1,4 +1,5 @@
-import { Text, useScroll } from '@react-three/drei'
+import { Text } from '@react-three/drei'
+import { useScroll } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import { useRef } from 'react'
 import * as THREE from 'three'

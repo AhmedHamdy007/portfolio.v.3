@@ -1,0 +1,52 @@
+Ahmed Hamdy
+Cloud / DevOps Engineer
+Kuala Lumpur, Malaysia | +60 11-1164 3110 | hamdy.mohamed@graduate.utm.my
+hamdyz.me | linkedin.com/in/ahmed-abdelaziz-784189262 | github.com/AhmedHamdy007
+Professional Summary
+Software Engineering student at Universiti Teknologi Malaysia (CGPA: 3.74/4.00) with six months of DevOps internship
+experience at PETRONAS Digital. Built Azure DevOps CI/CD pipelines and reusable Terraform, Linux, Bash, and
+Docker environments for private-network workloads, plus automated API validation and structured logging for .NET
+services. Hands-on with Kubernetes, Helm, Argo CD, GitHub Actions, and A WS EC2 instance deployment. Seeking
+graduate Cloud Operations, DevOps, or Platform Engineer roles in Malaysia; available full-time after graduation.
+Professional Experience
+Software Engineering Intern, DevOps Engineering Sep. 2025 – Mar. 2026
+PETRONAS Digital Kuala Lumpur, Malaysia
+- Built Azure DevOps YAML CI/CD pipelines to export, transform, validate, and deploy Hasura GraphQL metadata
+across development and production, reducing manual deployment steps and conﬁguration drift.
+- Automated Linux VM and self-hosted agent environments in restricted private networks using reusable Terraform,
+Bash, Docker, and Azure DevOps conﬁguration.
+- Created a reusable Groovy/Spock regression framework for dev-versus-prod JSON normalization, schema validation,
+ﬁltering, and endpoint veriﬁcation across microservices; integrated execution into CI pipelines.
+- Implemented Redis/HybridCache resilience and Serilog structured logging to console, ﬁle, Azure Blob Storage, and
+SQL sinks, with fallback handling for external-service failures.
+Selected Cloud and DevOps Projects
+StyleSense – AI-Powered Microservices Platform Jan. 2025 – May 2026
+Independent Project DigitalOcean
+- Architected and deployed a 9-service event-driven platform across 14 Docker containers using Node.js, TypeScript,
+FastAPI, PostgreSQL, RabbitMQ, Redis, and GitHub Actions.
+- Built multi-repository CI/CD pipelines across 9 repositories with service-triggered orchestration, automated image
+builds, and cross-service deployment workﬂows.
+A WS EC2 Deployment Independent Project
+Cloud Operations A WS
+- Provisioned an A WS EC2 instance and deployed a Dockerized application, conﬁguring the Linux runtime, application
+environment, and deployment veriﬁcation.
+- Used A WS CloudWatch for operational visibility and validated service health through application logs and health
+checks.
+Kubernetes and GitOps Platform Migration – StyleSense Aug. 2026 – Present
+Independent Project k3d / k3s
+- Migrating the 9-service Docker Compose platform to Kubernetes, authoring reusable Helm charts and standardizing
+service conﬁguration across environments.
+- Implementing Argo CD GitOps delivery, environment-based Helm values, and Sealed Secrets for a planned k3s VPS
+deployment.
+Technical Skills
+Cloud: Microsoft Azure (VMs, Blob Storage, Container Registry, Azure DevOps); A WS EC2, CloudWatch
+DevOps and IaC: Terraform, GitHub Actions, Azure DevOps YAML, Docker, Kubernetes, Helm, Argo CD, GitOps,
+CI/CD, Linux, Bash, Git
+Programming and Backend: Python, C#, .NET, Node.js, TypeScript, SQL, FastAPI, REST APIs, PostgreSQL,
+Redis
+Networking and Operations: TCP/IP, DNS, TLS/SSL, containers, secrets management, structured logging, health
+checks, automated testing
+Additional: RabbitMQ, Apache Kafka, Groovy/Spock, Jest, React, Angular
+Education
+Universiti T eknologi Malaysia (UTM) Expected Oct. 2026
+Bachelor of Computer Science (Software Engineering) | CGPA: 3.74/4.00 | Dean’s List High Honors

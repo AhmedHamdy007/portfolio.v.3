@@ -6,11 +6,12 @@ import { advanceLoadingCounter, loadingTarget, useLoadingState } from './loading
 import './signature-loader.css'
 import { traceLoader } from './loaderDiagnostics'
 
-const CONTACT_SHEETS = [2, 1, 4, 6, 7, 8, 10, 3].map(index => DRIFT_MOMENTS[index])
+const CONTACT_SHEETS = [2, 1, 4, 6, 7, 8, 10, 3].map(index => ({ ...DRIFT_MOMENTS[index], src: `/loader/memory-${index}.webp` }))
 
 export default function Preloader() {
   const { progress, active, errors, total } = useProgress()
   const sceneReady = useLoadingState(state => state.sceneReady)
+  const experienceReady = useLoadingState(state => state.experienceReady)
   const [done, setDone] = useState(() => useLoadingState.getState().phase === 'entered')
   const [photos, setPhotos] = useState(0)
   const [availablePhotos, setAvailablePhotos] = useState<number[]>([])
@@ -155,7 +156,7 @@ export default function Preloader() {
     return () => { gsap.ticker.remove(tick) }
   }, [done])
 
-  const assetsReady = total > 0 && progress >= 100 && !active && errors.length === 0 && sceneReady && documentReady && photos === 1
+  const assetsReady = total > 0 && progress >= 100 && !active && errors.length === 0 && sceneReady && experienceReady && documentReady && photos === 1
   const canExit = assetsReady && introReady && reelReady && counterReady
   useEffect(() => {
     if (!canExit || done || exiting.current || !panel.current) return
@@ -214,7 +215,7 @@ export default function Preloader() {
         </header>
         <div className="signature-loader__reel" aria-hidden="true">
           {CONTACT_SHEETS.map((moment, index) => <figure className="signature-loader__photo" key={moment.src}>
-            <img src={moment.src} alt="" decoding="async" fetchPriority={index === 0 ? 'high' : 'auto'} onError={event => { event.currentTarget.style.visibility = 'hidden' }} />
+            <img src={moment.src} width={500} height={625} alt="" decoding="async" fetchPriority={index === 0 ? 'high' : 'auto'} onError={event => { event.currentTarget.style.visibility = 'hidden' }} />
           </figure>)}
         </div>
       </div>

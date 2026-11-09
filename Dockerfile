@@ -5,6 +5,7 @@ COPY package.json package-lock.json ./
 RUN --mount=type=cache,target=/root/.npm npm ci
 COPY . .
 RUN npm run lint && node scripts/test-portal-exit.mjs && node scripts/test-album-journey.mjs && node scripts/test-signature-loader.mjs
+RUN node scripts/test-scroll-performance.mjs && node scripts/test-album-viewer.mjs
 RUN node scripts/test-production-assets.mjs
 RUN npm run build && node scripts/precompress.mjs
 

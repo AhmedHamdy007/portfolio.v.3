@@ -27,9 +27,8 @@ export function createGatewayGeometry(width: number, height: number) {
     bevelEnabled: true, bevelSize: 0.012, bevelThickness: 0.012, bevelSegments: 2,
   })
   frame.translate(0, 0, -0.1)
-  return [surface, frame].map(geometry => ({
-    geometry,
-    positions: (geometry.attributes.position as THREE.BufferAttribute).clone(),
-    normals: (geometry.attributes.normal as THREE.BufferAttribute).clone(),
-  }))
+  return [surface, frame].map(geometry => {
+    geometry.computeBoundingSphere()
+    return { geometry }
+  })
 }

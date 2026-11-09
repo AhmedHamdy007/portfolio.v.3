@@ -2,8 +2,9 @@ import { create } from 'zustand'
 
 export const useLoadingState = create<{
   sceneReady: boolean
+  experienceReady: boolean
   phase: 'loading' | 'revealing' | 'entered'
-}>(() => ({ sceneReady: false, phase: 'loading' }))
+}>(() => ({ sceneReady: false, experienceReady: false, phase: 'loading' }))
 
 export function loadingTarget(progress: number, photos: number, documentReady: boolean, sceneReady: boolean) {
   const assets = Number.isFinite(progress) ? Math.min(100, Math.max(0, progress)) : 0

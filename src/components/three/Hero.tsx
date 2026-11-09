@@ -1,4 +1,6 @@
 import { Cloud, Clouds, Stars, Text } from '@react-three/drei'
+import { useScroll } from '@react-three/drei'
+import { useFrame } from '@react-three/fiber'
 import gsap from 'gsap'
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
@@ -28,7 +30,22 @@ function StarsContainer() {
 
 export default function Hero() {
   const titleRef = useRef<THREE.Mesh>(null)
+  const windowLight = useRef<THREE.PointLight>(null)
+  const shadowPose = useRef(NaN)
+  const scroll = useScroll()
   const revealing = useLoadingState(state => state.phase !== 'loading')
+
+  useFrame(() => {
+    const light = windowLight.current
+    if (!light) return
+    // Camera movement does not change a shadow map. Rebuild its six faces
+    // only when the actual handle/door geometry changes, including reverse scroll.
+    const pose = scroll.range(0.4, 0.1) + scroll.range(0.5, 0.1)
+    if (pose !== shadowPose.current || !light.shadow.map) {
+      light.shadow.needsUpdate = true
+      shadowPose.current = pose
+    }
+  })
 
   useEffect(() => {
     if (!revealing || !titleRef.current) return
@@ -44,7 +61,7 @@ export default function Hero() {
       <StarsContainer />
       <CloudContainer />
       <group position={[0, -25, 5.69]}>
-        <pointLight castShadow position={[1, 1, -2.5]} intensity={60} distance={10} />
+        <pointLight ref={windowLight} castShadow shadow-autoUpdate={false} position={[1, 1, -2.5]} intensity={60} distance={10} />
         <WindowModel receiveShadow />
         <TextWindow />
       </group>

@@ -2,6 +2,7 @@ import { create } from 'zustand'
 
 interface AlbumState {
   selected: number | null
+  indexOpen: boolean
   ready: boolean
   entryReady: boolean
   assetErrors: string[]
@@ -11,6 +12,7 @@ interface AlbumState {
 
 export const useAlbumState = create<AlbumState>((set) => ({
   selected: null,
+  indexOpen: false,
   ready: false,
   entryReady: false,
   assetErrors: [],

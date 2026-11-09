@@ -1,4 +1,5 @@
-import { Text, useCursor, useScroll } from '@react-three/drei'
+import { Text, useCursor } from '@react-three/drei'
+import { useScroll } from '@react-three/drei'
 import { useFrame } from '@react-three/fiber'
 import gsap from 'gsap'
 import { useEffect, useRef, useState } from 'react'

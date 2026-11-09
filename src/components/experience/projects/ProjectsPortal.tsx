@@ -1,4 +1,3 @@
-import { useScroll } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import gsap from 'gsap'
 import { useEffect, useRef } from 'react'
@@ -14,7 +13,6 @@ export default function ProjectsPortal() {
   const pointer = useRef({ x: 0, y: 0 })
   const isActive = usePortalStore((state) => state.activePortalId === 'projects')
   const isClosing = usePortalStore(state => state.isClosing)
-  const data = useScroll()
   const isMobile = useIsMobile()
   useEffect(() => {
     if (!isActive || isClosing || isMobile) return
@@ -33,13 +31,11 @@ export default function ProjectsPortal() {
     }
   }, [gl, isActive, isClosing, isMobile])
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/immutability
-    if (data?.el) data.el.style.overflow = isActive ? 'hidden' : 'auto'
     if (isActive && !isClosing) {
       const tween = gsap.to(camera.position, { ...(isMobile ? { z: 11.5, y: -39, x: 1 } : { y: -39, x: 2 }), duration: 1, overwrite: 'auto' })
       return () => { tween.kill() }
     }
-  }, [camera, data, isActive, isMobile, isClosing])
+  }, [camera, isActive, isMobile, isClosing])
 
   useFrame((_, delta) => {
     if (!isActive || isMobile || usePortalStore.getState().isClosing) return

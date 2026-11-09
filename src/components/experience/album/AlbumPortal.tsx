@@ -1,20 +1,21 @@
 import { ScrollControls } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
-import { Bloom, EffectComposer, Noise, Vignette } from '@react-three/postprocessing'
-import { BlendFunction, ChromaticAberrationEffect } from 'postprocessing'
 import gsap from 'gsap'
-import { lazy, Suspense, useEffect, useLayoutEffect, useMemo, useRef, useSyncExternalStore, type MutableRefObject } from 'react'
+import { Suspense, useEffect, useLayoutEffect, useMemo, useRef, useSyncExternalStore } from 'react'
 import * as THREE from 'three'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { usePortalStore, useScrollStore } from '@/store'
 import { NestedScrollLayer } from '@/components/three/ScrollLayerBridge'
-import AlbumAtmosphere from './AlbumAtmosphere'
 import AlbumAssetBoundary from './AlbumAssetBoundary'
 import DriftingWall, { type AlbumMotion } from './DriftingWall'
 import { useAlbumState } from './albumState'
-import { journeyBank, journeyPose } from './albumJourney'
-
-const AlbumJourneyScenes = lazy(() => import('./AlbumJourneyScenes'))
+import { layerCameraBank, layerCameraPose } from './layerJourney'
+import MemoryCamera, { MemoryStudio } from './MemoryCamera'
+import MemoryChamber from './MemoryChamber'
+import OpticalBreach from './OpticalBreach'
+import MemoryGrain from './MemoryGrain'
+import MemoryLayers from './MemoryLayers'
+import MemoryClockwork from './MemoryClockwork'
 
 const subscribeMotion = (callback: () => void) => {
   const query = window.matchMedia('(prefers-reduced-motion: reduce)')
@@ -28,6 +29,8 @@ function AlbumCamera({ mobile, reduced }: { mobile: boolean; reduced: boolean })
   const active = usePortalStore(state => state.activePortalId === 'album')
   const entered = useRef(false)
   const entryTimeline = useRef<gsap.core.Timeline | null>(null)
+  const preferences = useRef({ mobile, reduced })
+  useLayoutEffect(() => { preferences.current = { mobile, reduced } }, [mobile, reduced])
   const closing = usePortalStore(state => state.isClosing)
   useLayoutEffect(() => {
     if (closing) entryTimeline.current?.kill()
@@ -35,17 +38,17 @@ function AlbumCamera({ mobile, reduced }: { mobile: boolean; reduced: boolean })
   const scratch = useMemo(() => ({ position: new THREE.Vector3(), look: new THREE.Vector3(), up: new THREE.Vector3(), matrix: new THREE.Matrix4(), quaternion: new THREE.Quaternion(), bank: new THREE.Quaternion(), axis: new THREE.Vector3(0, 0, 1) }), [])
   useLayoutEffect(() => {
     if (!active) return
+    const initialPreferences = preferences.current
     useAlbumState.setState({ entryReady: false })
     entered.current = false
-    const initialFov = journeyPose(0, scratch.position, scratch.look)
-    if (mobile) scratch.look.setX(scratch.look.x + 3)
+    const initialFov = layerCameraPose(0, scratch.position, scratch.look)
     scratch.position.applyMatrix4(scene.matrixWorld)
     scratch.look.applyMatrix4(scene.matrixWorld)
     scratch.up.set(0, 1, 0).transformDirection(scene.matrixWorld)
     scratch.matrix.lookAt(scratch.position, scratch.look, scratch.up)
     scratch.quaternion.setFromRotationMatrix(scratch.matrix)
-    scratch.quaternion.multiply(scratch.bank.setFromAxisAngle(scratch.axis, reduced ? 0 : journeyBank(0)))
-    const duration = reduced ? 0.25 : 2
+    scratch.quaternion.multiply(scratch.bank.setFromAxisAngle(scratch.axis, initialPreferences.reduced ? 0 : layerCameraBank(0)))
+    const duration = initialPreferences.reduced ? 0.25 : 2
     const startPosition = camera.position.clone()
     const startQuaternion = camera.quaternion.clone()
     const entry = { value: 0 }
@@ -60,7 +63,7 @@ function AlbumCamera({ mobile, reduced }: { mobile: boolean; reduced: boolean })
       camera.position.lerpVectors(startPosition, scratch.position, entry.value)
       camera.quaternion.slerpQuaternions(startQuaternion, scratch.quaternion, entry.value)
     } }, 0)
-      .to(camera, { fov: initialFov + (mobile ? 7 : 0), duration, ease: 'power3.inOut', onUpdate: () => camera.updateProjectionMatrix() }, 0)
+      .to(camera, { fov: initialFov + (initialPreferences.mobile ? 7 : 0), duration, ease: 'power3.inOut', onUpdate: () => camera.updateProjectionMatrix() }, 0)
     return () => {
       timeline.kill()
       window.removeEventListener('touchmove', holdTouch, true)
@@ -69,77 +72,75 @@ function AlbumCamera({ mobile, reduced }: { mobile: boolean; reduced: boolean })
       // GridTile owns the complete animated return, including FOV and bank.
       // Cleanup must not snap the shared camera while that transition runs.
     }
-  }, [active, camera, mobile, reduced, scene, scratch])
+  }, [active, camera, scene, scratch])
   useFrame((_, delta) => {
     if (!active || usePortalStore.getState().isClosing || !entered.current || useAlbumState.getState().selected !== null) return
     const progress = useScrollStore.getState().scrollProgress
-    const fov = journeyPose(progress, scratch.position, scratch.look) + (mobile ? 7 : 0)
-    if (mobile) scratch.look.setX(scratch.look.x + 3 * (1 - THREE.MathUtils.smoothstep(progress, 0, 0.15)))
+    const journeyFov = layerCameraPose(progress, scratch.position, scratch.look)
+    const fov = (reduced ? 42 : journeyFov) + (mobile ? 7 : 0)
+    if (mobile) { scratch.position.setX(scratch.position.x * 0.28); scratch.look.setX(scratch.look.x * 0.28) }
+    // Reduced motion keeps a steady, front-facing camera; prints still unfold.
+    if (reduced) { scratch.position.set(0, 0.6, 14); scratch.look.set(0, 0, 0) }
     scratch.position.applyMatrix4(scene.matrixWorld)
     scratch.look.applyMatrix4(scene.matrixWorld)
     scratch.up.set(0, 1, 0).transformDirection(scene.matrixWorld)
     scratch.matrix.lookAt(scratch.position, scratch.look, scratch.up)
     scratch.quaternion.setFromRotationMatrix(scratch.matrix)
-    scratch.quaternion.multiply(scratch.bank.setFromAxisAngle(scratch.axis, reduced ? 0 : journeyBank(progress) * (mobile ? 0.65 : 1)))
-    const alpha = 1 - Math.exp(-(reduced ? 10 : 7) * Math.min(delta, 0.05))
+    scratch.quaternion.multiply(scratch.bank.setFromAxisAngle(scratch.axis, reduced ? 0 : layerCameraBank(progress) * (mobile ? 0.35 : 1)))
+    const alpha = 1 - Math.exp(-12 * Math.min(delta, 0.05))
     camera.position.lerp(scratch.position, alpha)
     camera.quaternion.slerp(scratch.quaternion, alpha)
     if (camera instanceof THREE.PerspectiveCamera) {
       // R3F cameras are imperative objects owned exclusively by this active rig.
+      const nextFov = THREE.MathUtils.lerp(camera.fov, fov, alpha)
       // eslint-disable-next-line react-hooks/immutability
-      camera.fov = THREE.MathUtils.lerp(camera.fov, fov, alpha)
-      camera.updateProjectionMatrix()
+      if (Math.abs(nextFov - camera.fov) > 0.0001) { camera.fov = nextFov; camera.updateProjectionMatrix() }
     }
   }, -0.5)
   return null
 }
 
-function AlbumEffects({ mobile, reduced, motion }: { mobile: boolean; reduced: boolean; motion: MutableRefObject<AlbumMotion> }) {
-  const chromatic = useMemo(() => new ChromaticAberrationEffect({ offset: new THREE.Vector2(), radialModulation: true, modulationOffset: 0.3 }), [])
-  useEffect(() => () => chromatic.dispose(), [chromatic])
-  useFrame(() => {
-    const amount = reduced || useAlbumState.getState().selected !== null ? 0 : Math.min(Math.abs(motion.current.velocity) * 0.00011, 0.00065)
-    chromatic.offset.set(amount * 0.6, amount)
-  })
-  return <EffectComposer multisampling={0} enableNormalPass={false} renderPriority={2}>
-    <Bloom intensity={mobile ? 0.3 : 0.45} luminanceThreshold={1} luminanceSmoothing={0.25} mipmapBlur />
-    <primitive object={chromatic} dispose={null} />
-    <Vignette offset={0.3} darkness={0.45} />
-    <Noise opacity={0.018} blendFunction={BlendFunction.SOFT_LIGHT} />
-  </EffectComposer>
-}
-
 function AlbumWorld() {
+  const { gl, scene, camera } = useThree()
   const mobile = useIsMobile()
   const reduced = useSyncExternalStore(subscribeMotion, getMotion, () => false)
   const active = usePortalStore(state => state.activePortalId === 'album')
   const closing = usePortalStore(state => state.isClosing)
-  const entryReady = useAlbumState(state => state.entryReady)
+  const photosReady = useAlbumState(state => state.ready)
+  useEffect(() => {
+    if (!active || !photosReady || !gl.extensions.has('KHR_parallel_shader_compile')) return
+    // Compile hidden chamber/effect variants during the entrance, not at their
+    // first scroll boundary. Do not force a synchronous fallback on old GPUs.
+    const timer = window.setTimeout(() => {
+      void gl.compileAsync(scene, camera).catch(error => console.warn('Album shader warm-up unavailable', error))
+    }, 180)
+    return () => window.clearTimeout(timer)
+  }, [active, photosReady, mobile, reduced, gl, scene, camera])
+  useLayoutEffect(() => {
+    if (active && closing) useAlbumState.getState().select(null)
+  }, [active, closing])
   const motion = useRef<AlbumMotion>({ travel: 0, velocity: 0 })
-  const lightTarget = useMemo(() => new THREE.Object3D(), [])
   return <>
-    <color attach="background" args={['#030508']} />
-    <fog attach="fog" args={['#030508', 16, 75]} />
-    <primitive object={lightTarget} position={[0, 0, -12]} />
-    <ambientLight color="#e2dece" intensity={0.8} />
-    <directionalLight target={lightTarget} position={[7, 12, 10]} color="#ffe3bc" intensity={3.2} />
-    <directionalLight target={lightTarget} position={[-12, 4, -30]} color="#8bc8ec" intensity={2.4} />
-    <pointLight position={[-3, 3, -3]} color="#8844ff" intensity={0.8} />
-    <AlbumAssetBoundary name="Atmosphere"><Suspense fallback={null}><AlbumAtmosphere mobile={mobile} reduced={reduced} /></Suspense></AlbumAssetBoundary>
-    <group position={active ? [0, -10, -6.2] : [0, 0, 0]}>
+    <color attach="background" args={['#171d1b']} />
+    <MemoryStudio />
+    <AlbumAssetBoundary name="Memory camera"><Suspense fallback={null}><MemoryCamera mobile={mobile} reduced={reduced} /></Suspense></AlbumAssetBoundary>
+    <MemoryGrain mobile={mobile} reduced={reduced} />
+    <MemoryChamber mobile={mobile} reduced={reduced} />
+    <MemoryLayers mobile={mobile} reduced={reduced} />
+    <MemoryClockwork mobile={mobile} reduced={reduced} />
+    <group position={active ? [0, 0, 0] : [0, 0, -2]}>
       <AlbumAssetBoundary name="Photographs"><Suspense fallback={null}><DriftingWall mobile={mobile} reduced={reduced} motion={motion} /></Suspense></AlbumAssetBoundary>
     </group>
-    {active && <AlbumAssetBoundary name="Journey"><Suspense fallback={null}><AlbumJourneyScenes reduced={reduced} mobile={mobile} /></Suspense></AlbumAssetBoundary>}
     <AlbumCamera mobile={mobile} reduced={reduced} />
-    {/* The fullscreen composer must yield to the portal's two-scene exit blend. */}
-    {active && entryReady && !closing && <AlbumEffects mobile={mobile} reduced={reduced} motion={motion} />}
+    <OpticalBreach mobile={mobile} reduced={reduced} />
+    {/* No fullscreen composer: portal blending retains sole render ownership. */}
   </>
 }
 
 export default function AlbumPortal() {
   const active = usePortalStore(state => state.activePortalId === 'album')
   const setScrollProgress = useScrollStore(state => state.setScrollProgress)
-  return <ScrollControls pages={6} damping={0.22} maxSpeed={0.6} distance={1}>
+  return <ScrollControls pages={5} damping={0.22} maxSpeed={0.6} distance={1} style={{ overflowY: 'hidden', touchAction: 'none' }}>
     <NestedScrollLayer id="album" active={active} onProgress={setScrollProgress} />
     <AlbumWorld />
   </ScrollControls>

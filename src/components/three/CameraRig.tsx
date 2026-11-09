@@ -3,6 +3,7 @@ import { useScroll } from '@react-three/drei'
 import * as THREE from 'three'
 import { usePortalStore, useScrollStore } from '@/store'
 import { useIsMobile } from '@/hooks/use-mobile'
+import { followPointerYaw } from './cameraMotion'
 
 /**
  * Replicates the reference site's camera choreography:
@@ -13,12 +14,14 @@ import { useIsMobile } from '@/hooks/use-mobile'
 export default function CameraRig() {
   const { camera } = useThree()
   const data = useScroll()
-  const isPortalActive = usePortalStore((s) => !!s.activePortalId)
   const setScrollProgress = useScrollStore((s) => s.setScrollProgress)
   const isMobile = useIsMobile()
 
   useFrame((state, delta) => {
     if (!data) return
+    // Read ownership synchronously. A React snapshot can be one frame behind
+    // the click and overwrite the nested scene's freshly reset progress.
+    const isPortalActive = !!usePortalStore.getState().activePortalId
     const a = data.range(0, 0.3)
     const b = data.range(0.3, 0.5)
     const d = data.range(0.85, 0.18)
@@ -36,15 +39,12 @@ export default function CameraRig() {
       camera.position.y = THREE.MathUtils.damp(camera.position.y, -37 * b, 7, delta)
       camera.position.z = THREE.MathUtils.damp(camera.position.z, 5 + 10 * d, 7, delta)
       camera.position.x = THREE.MathUtils.damp(camera.position.x, 0, 7, delta)
-      camera.rotation.y = THREE.MathUtils.damp(camera.rotation.y, 0, 7, delta)
+      camera.rotation.y = followPointerYaw(camera.rotation.y, state.pointer.x, delta, isMobile)
       // Portals may bank their camera; the outer world always has a level horizon.
       camera.rotation.z = THREE.MathUtils.damp(camera.rotation.z, 0, 7, delta)
       setScrollProgress(data.range(0, 1))
     }
 
-    if (!isMobile && !isPortalActive) {
-      camera.rotation.y = THREE.MathUtils.lerp(camera.rotation.y, -(state.pointer.x * Math.PI) / 90, 0.05)
-    }
   })
 
   return null

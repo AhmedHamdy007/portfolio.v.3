@@ -33,17 +33,19 @@ const indices = JSON.parse(source.match(/const CONTACT_SHEETS = (\[[^\]]+\])/)[1
 assert.equal(new Set(indices).size, 8)
 let bytes = 0
 for (const index of indices) {
-  const file = `public${DRIFT_MOMENTS[index].src}`
+  assert(DRIFT_MOMENTS[index], 'Loader corresponds to an existing album photograph')
+  const file = `public/loader/memory-${index}.webp`
   const size = statSync(file).size
-  assert(size < 350_000, 'Reuse lightweight photos, not high-resolution originals')
+  assert(size < 100_000, 'Use display-sized loader photographs')
   bytes += size
 }
-assert(bytes < 1_500_000)
+assert(bytes < 400_000)
 const sceneSource = readFileSync('src/components/three/Scene.tsx', 'utf8')
 assert(sceneSource.includes("lazy(() => import('./ExperienceSection'))"), 'Heavy portal imports stay off the startup path')
 assert(!/import ExperienceSection from/.test(sceneSource), 'No eager portal import may restart GLB preloads during the intro')
-assert(sceneSource.includes("state.phase === 'entered'"), 'Deferred worlds wait until the loader has exited')
-assert(sceneSource.includes('<Suspense fallback={null}><ExperienceSection /></Suspense>'), 'Later assets cannot suspend the visible hero')
+assert(sceneSource.includes('state.sceneReady'), 'Deferred worlds wait for the critical hero')
+assert(source.includes('sceneReady && experienceReady'), 'Do not release scrolling during the portal setup burst')
+assert(sceneSource.includes('<Suspense fallback={null}><ExperienceSection /><ExperienceReady /></Suspense>'), 'Later assets cannot suspend the hero')
 const bridgeSource = readFileSync('src/components/three/ScrollLayerBridge.tsx', 'utf8')
 assert(bridgeSource.includes('if (!active && connected !== scroll.el) connect?.(scroll.el)'), 'Late portals must not steal homepage scroll events')
 const heroSource = readFileSync('src/components/three/Hero.tsx', 'utf8')

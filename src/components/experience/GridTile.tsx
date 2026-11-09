@@ -1,12 +1,14 @@
-import { MeshPortalMaterial, Text, useScroll, type TextProps } from '@react-three/drei'
+import { Text, useIntersect, type TextProps } from '@react-three/drei'
+import { useScroll } from '@react-three/drei'
 import { useFrame, useThree } from '@react-three/fiber'
 import gsap from 'gsap'
-import { useEffect, useLayoutEffect, useMemo, useRef, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import * as THREE from 'three'
 import { useIsMobile } from '@/hooks/use-mobile'
 import { usePortalStore, FONTS } from '@/store'
 import { createGatewayGeometry } from './gatewayGeometry'
 import { capturePortalCamera, returnPortalCamera } from './portalTransition'
+import EfficientPortalMaterial from './EfficientPortalMaterial'
 
 interface GridTileProps {
   id: string
@@ -19,7 +21,9 @@ interface GridTileProps {
 
 export default function GridTile({ id, title, children, color, position }: GridTileProps) {
   const portalRef = useRef<{ blend: number }>(null)
-  const label = useRef<THREE.Group>(null)
+  const [portalVisible, setPortalVisible] = useState(false)
+  const meshRef = useIntersect<THREE.Mesh>(setPortalVisible)
+  const anchorRef = useRef<THREE.Group>(null)
   const hovered = useRef(false)
   const pose = useRef({ x: 0, y: 0, z: 0, lift: 0 })
   const reduced = useRef(false)
@@ -36,7 +40,7 @@ export default function GridTile({ id, title, children, color, position }: GridT
   const width = 2.65 * layoutScale
   const height = isMobile ? 2.85 : 3.65
   const surfaces = useMemo(() => createGatewayGeometry(width, height), [width, height])
-  const scratch = useMemo(() => ({ surfaces, matrix: new THREE.Matrix4(), previous: new THREE.Matrix4(), rotation: new THREE.Euler(), label: new THREE.Vector3() }), [surfaces])
+  const scratch = useMemo(() => ({ matrix: new THREE.Matrix4(), previous: new THREE.Matrix4(), rotation: new THREE.Euler() }), [])
   const side = id === 'work' ? -1 : id === 'projects' ? 1 : 0
 
   useEffect(() => {
@@ -89,8 +93,8 @@ export default function GridTile({ id, title, children, color, position }: GridT
   }, [activePortalId])
 
   useFrame(({ pointer }, delta) => {
-    // Sculpt the aperture, not its parent transform: portal scene matrices and
-    // the existing Work/Projects camera coordinates stay completely unchanged.
+    // Move the aperture as one object; the separate anchor keeps each portal
+    // world's coordinates fixed. Geometry and GPU buffers stay immutable.
     if (activePortalId || scroll.offset < 0.75) return
     const interactive = !isMobile && !reduced.current
     const reveal = reduced.current ? 1 : THREE.MathUtils.smoothstep(scroll.offset, 0.79, 0.98)
@@ -105,32 +109,25 @@ export default function GridTile({ id, title, children, color, position }: GridT
     scratch.matrix.setPosition(0, p.lift - (1 - reveal) * 0.35, (side ? -0.5 : 0.45) + p.lift)
     if (scratch.matrix.elements.every((value, index) => Math.abs(value - scratch.previous.elements[index]) < 0.00001)) return
     scratch.previous.copy(scratch.matrix)
-    for (const { geometry, positions, normals } of scratch.surfaces) {
-      ;(geometry.attributes.position as THREE.BufferAttribute).copy(positions)
-      ;(geometry.attributes.normal as THREE.BufferAttribute).copy(normals)
-      geometry.applyMatrix4(scratch.matrix)
-      geometry.computeBoundingSphere()
+    if (meshRef.current) {
+      meshRef.current.matrix.copy(scratch.matrix)
+      meshRef.current.matrixWorldNeedsUpdate = true
     }
-    if (label.current) {
-      scratch.label.set(0, -height / 2 - 0.34, 0.03).applyMatrix4(scratch.matrix)
-      label.current.position.copy(scratch.label)
-      label.current.rotation.copy(scratch.rotation)
-    }
-  })
+  }, -2.5)
 
-  return <mesh position={position} geometry={surfaces[0].geometry}
+  return <group ref={anchorRef} position={position}><mesh ref={meshRef} matrixAutoUpdate={false} geometry={surfaces[0].geometry}
     onClick={event => { if (!activePortalId) { event.stopPropagation(); returnPose.current = capturePortalCamera(camera); setActivePortal(id) } }}
     onPointerOver={event => { if (!activePortalId && !isMobile) { event.stopPropagation(); hovered.current = true; document.body.style.cursor = 'pointer' } }}
     onPointerOut={() => { hovered.current = false; document.body.style.cursor = '' }}>
     <mesh geometry={surfaces[1].geometry} raycast={() => {}}>
       <meshStandardMaterial color="#d4d9d6" metalness={0.65} roughness={0.3} />
     </mesh>
-    <group ref={label}>
+    <group position={[0, -height / 2 - 0.34, 0.03]}>
       <Text font={FONTS.serif} anchorX="center" anchorY="middle" fontSize={isMobile ? 0.13 : 0.24} color="#f3f0e8" maxWidth={width} textAlign="center">{title}</Text>
     </group>
-    <MeshPortalMaterial ref={portalRef as never} blend={0} resolution={0} blur={0} side={THREE.DoubleSide}>
+    <EfficientPortalMaterial ref={portalRef as never} parent={meshRef} anchor={anchorRef} visible={portalVisible}>
       <color attach="background" args={[color]} />
       {children}
-    </MeshPortalMaterial>
-  </mesh>
+    </EfficientPortalMaterial>
+  </mesh></group>
 }

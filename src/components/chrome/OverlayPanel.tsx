@@ -39,9 +39,9 @@ export default function OverlayPanel() {
       {isAlbum ? (
         <AlbumExperience />
       ) : isWork ? (
-        <div className="absolute bottom-6 left-1/2 w-[min(32rem,calc(100vw-3rem))] -translate-x-1/2 text-center text-white/80">
+        <div className="absolute bottom-6 left-1/2 w-[min(42rem,calc(100vw-3rem))] -translate-x-1/2 text-center text-white/80">
           <p className="text-[0.72rem] leading-5 tracking-[0.05em]">
-            “He possesses the drive, curiosity, persistence, and technical aptitude to become an outstanding DevOps engineer.”
+            “During his internship, I intentionally assigned him tasks that would normally be considered beyond the scope of an intern. Rather than being discouraged, he approached every challenge with determination and persistence until he successfully delivered the expected results.”
           </p>
           <p className="mt-2 text-[0.58rem] tracking-[0.24em] text-white/60">— AMIN, PETRONAS TECHNICAL LEAD</p>
         </div>

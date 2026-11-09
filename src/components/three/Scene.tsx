@@ -1,35 +1,65 @@
 import { AdaptiveDpr, ScrollControls } from '@react-three/drei'
 import { Canvas, useFrame, useThree } from '@react-three/fiber'
 import gsap from 'gsap'
-import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, startTransition, type ReactNode } from 'react'
 import { useThemeStore } from '@/store'
 import { useIsMobile } from '@/hooks/use-mobile'
 import CameraRig from './CameraRig'
 import Hero from './Hero'
 import Footer3D from './Footer3D'
 import AlbumProfiler from './AlbumProfiler'
+import FlowProfiler from './FlowProfiler'
 import ThemeSwitcher from '@/components/chrome/ThemeSwitcher'
 import ScrollHint from '@/components/chrome/ScrollHint'
 import { OuterScrollLayer } from './ScrollLayerBridge'
 import { useLoadingState } from '@/components/chrome/loadingState'
+import { warmOpening } from './warmOpening'
+import { warmPortalPreviews } from '@/components/experience/portalWarmup'
 
 // Importing this module also starts the portal models' module-level preloads.
-// Keep that decoding and portal setup out of the opening scene's critical path.
+// Prepare after the hero is ready, but BEFORE unlocking the first scroll.
 const ExperienceSection = lazy(() => import('./ExperienceSection'))
 
 function DeferredExperience() {
-  const entered = useLoadingState(state => state.phase === 'entered')
+  const heroReady = useLoadingState(state => state.sceneReady)
   const [enabled, setEnabled] = useState(false)
   useEffect(() => {
-    if (!entered) return
-    const idle = window.requestIdleCallback?.(() => setEnabled(true), { timeout: 1500 })
-    const timer = idle === undefined ? window.setTimeout(() => setEnabled(true), 250) : undefined
+    if (!heroReady) return
+    const prepare = () => startTransition(() => setEnabled(true))
+    const idle = window.requestIdleCallback?.(prepare, { timeout: 700 })
+    const timer = idle === undefined ? window.setTimeout(prepare, 100) : undefined
     return () => {
       if (idle !== undefined) window.cancelIdleCallback(idle)
       if (timer !== undefined) window.clearTimeout(timer)
     }
-  }, [entered])
-  return enabled ? <Suspense fallback={null}><ExperienceSection /></Suspense> : null
+  }, [heroReady])
+  return enabled ? <Suspense fallback={null}><ExperienceSection /><ExperienceReady /></Suspense> : null
+}
+
+function ExperienceReady() {
+  const gl = useThree(state => state.gl)
+  const scene = useThree(state => state.scene)
+  const camera = useThree(state => state.camera)
+  useEffect(() => {
+    let cancelled = false
+    let second = 0
+    let third = 0
+    const first = requestAnimationFrame(() => {
+      void warmOpening(gl, scene, camera, () => cancelled).then(() => warmPortalPreviews(gl, () => cancelled)).catch(error => {
+        console.warn('Opening warm-up unavailable; using normal rendering.', error)
+      }).finally(() => {
+        if (cancelled) return
+        second = requestAnimationFrame(() => {
+          third = requestAnimationFrame(() => useLoadingState.setState({ experienceReady: true }))
+        })
+      })
+    })
+    return () => {
+      cancelled = true
+      cancelAnimationFrame(first); cancelAnimationFrame(second); cancelAnimationFrame(third)
+    }
+  }, [gl, scene, camera])
+  return null
 }
 
 function SceneReady() {
@@ -78,7 +108,7 @@ export default function Scene({ children }: { children?: ReactNode }) {
   const [ready, setReady] = useState(false)
   const theme = useThemeStore((state) => state.theme)
   const isMobile = useIsMobile()
-  const holdingIntro = useLoadingState(state => state.sceneReady && state.phase === 'loading')
+  const holdingIntro = useLoadingState(state => state.sceneReady && state.experienceReady && state.phase === 'loading')
 
   useEffect(() => {
     if (!wrapperRef.current || !canvasRef.current) return
@@ -117,6 +147,7 @@ export default function Scene({ children }: { children?: ReactNode }) {
           </Suspense>
           <AdaptiveDpr pixelated />
           <AlbumProfiler />
+          <FlowProfiler />
         </Canvas>
         <CanvasReveal ready={ready} />
       </div>

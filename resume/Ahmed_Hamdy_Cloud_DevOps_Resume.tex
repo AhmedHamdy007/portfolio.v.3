@@ -1,0 +1,94 @@
+\documentclass[10pt,a4paper]{article}
+
+\usepackage[margin=0.55in]{geometry}
+\usepackage{cmap}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{lmodern}
+\usepackage{selnolig}
+\usepackage[hidelinks]{hyperref}
+\usepackage{enumitem}
+\usepackage{titlesec}
+\usepackage{microtype}
+\usepackage{xcolor}
+
+\pagestyle{empty}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{0pt}
+\urlstyle{same}
+\setlist[itemize]{leftmargin=1.25em,label={-},noitemsep,topsep=1pt,parsep=0pt,partopsep=0pt}
+\titleformat{\section}{\large\bfseries}{}{0em}{}[\titlerule]
+\titlespacing*{\section}{0pt}{7pt}{3pt}
+
+\newcommand{\entryheader}[4]{%
+  \textbf{#1} \hfill #2\\[-1pt]
+  \textit{#3} \hfill \textit{#4}\\[-2pt]
+}
+
+\begin{document}
+
+\begin{center}
+  {\LARGE\bfseries Ahmed Hamdy}\\[2pt]
+  {\normalsize\bfseries Cloud / DevOps Engineer}\\[3pt]
+  Kuala Lumpur, Malaysia \quad | \quad +60 11-1164 3110 \quad | \quad \href{mailto:hamdy.mohamed@graduate.utm.my}{hamdy.mohamed@graduate.utm.my}\\[2pt]
+  \href{https://www.hamdyz.me}{hamdyz.me} \quad | \quad
+  \href{https://www.linkedin.com/in/ahmed-abdelaziz-784189262}{linkedin.com/in/ahmed-abdelaziz-784189262} \quad | \quad
+  \href{https://github.com/AhmedHamdy007}{github.com/AhmedHamdy007}
+\end{center}
+
+\section*{Professional Summary}
+Software Engineering student at Universiti Teknologi Malaysia (CGPA: 3.74/4.00) with six months of DevOps internship experience at PETRONAS Digital. Built Azure DevOps CI/CD pipelines and reusable Terraform, Linux, Bash, and Docker environments for private-network workloads, plus automated API validation and structured logging for .NET services. Hands-on with Kubernetes, Helm, Argo CD, GitHub Actions, and AWS EC2 instance deployment. Seeking graduate Cloud Operations, DevOps, or Platform Engineer roles in Malaysia; available full-time after graduation.
+
+\section*{Professional Experience}
+\entryheader{Software Engineering Intern, DevOps Engineering}{Sep. 2025 -- Mar. 2026}{PETRONAS Digital}{Kuala Lumpur, Malaysia}
+\begin{itemize}
+  \item Built Azure DevOps YAML CI/CD pipelines to export, transform, validate, and deploy Hasura GraphQL metadata across development and production, reducing manual deployment steps and conf{}iguration drift.
+  \item Automated Linux VM and self-hosted agent environments in restricted private networks using reusable Terraform, Bash, Docker, and Azure DevOps conf{}iguration.
+  \item Created a reusable Groovy/Spock regression framework for dev-versus-prod JSON normalization, schema validation, f{}iltering, and endpoint verif{}ication across microservices; integrated execution into CI pipelines.
+  \item Implemented Redis/HybridCache resilience and Serilog structured logging to console, f{}ile, Azure Blob Storage, and SQL sinks, with fallback handling for external-service failures.
+\end{itemize}
+
+\section*{Selected Cloud and DevOps Projects}
+\entryheader{StyleSense -- AI-Powered Microservices Platform}{Jan. 2025 -- May 2026}{Independent Project}{DigitalOcean}
+\begin{itemize}
+  \item Architected and deployed a 9-service event-driven platform across 14 Docker containers using Node.js, TypeScript, FastAPI, PostgreSQL, RabbitMQ, Redis, and GitHub Actions.
+  \item Built multi-repository CI/CD pipelines across 9 repositories with service-triggered orchestration, automated image builds, and cross-service deployment workflows.
+\end{itemize}
+
+\entryheader{AWS EC2 Deployment}{Independent Project}{Cloud Operations}{AWS}
+\begin{itemize}
+  \item Provisioned an AWS EC2 instance and deployed a Dockerized application, conf{}iguring the Linux runtime, application environment, and deployment verif{}ication.
+  \item Used AWS CloudWatch for operational visibility and validated service health through application logs and health checks.
+\end{itemize}
+
+\entryheader{Kubernetes and GitOps Platform Migration -- StyleSense}{Aug. 2026 -- Present}{Independent Project}{k3d / k3s}
+\begin{itemize}
+  \item Migrating the 9-service Docker Compose platform to Kubernetes, authoring reusable Helm charts and standardizing service conf{}iguration across environments.
+  \item Implementing Argo CD GitOps delivery, environment-based Helm values, and Sealed Secrets for a planned k3s VPS deployment.
+\end{itemize}
+
+\section*{Technical Skills}
+\textbf{Cloud:} Microsoft Azure (VMs, Blob Storage, Container Registry, Azure DevOps); AWS EC2, CloudWatch\\
+\textbf{DevOps and IaC:} Terraform, GitHub Actions, Azure DevOps YAML, Docker, Kubernetes, Helm, Argo CD, GitOps, CI/CD, Linux, Bash, Git\\
+\textbf{Programming and Backend:} Python, C\#, .NET, Node.js, TypeScript, SQL, FastAPI, REST APIs, PostgreSQL, Redis\\
+\textbf{Networking and Operations:} TCP/IP, DNS, TLS/SSL, containers, secrets management, structured logging, health checks, automated testing\\
+\textbf{Additional:} RabbitMQ, Apache Kafka, Groovy/Spock, Jest, React, Angular
+
+\section*{Education}
+\textbf{Universiti Teknologi Malaysia (UTM)} \hfill Expected Oct. 2026\\[-1pt]
+Bachelor of Computer Science (Software Engineering) \quad | \quad CGPA: 3.74/4.00 \quad | \quad Dean's List High Honors
+
+\end{document}
+
+
+
+
+
+
+
+
+
+
+
+
+
